@@ -6,11 +6,13 @@ const publications = [
     title: 'GUS: A Graph Utility Score Framework for Method Selection in Fraud Detection',
     venue: 'Proc. 4th Intl. Conf. on Data Science, Agents and Artificial Intelligence (ICDSAAI 2026), IEEE',
     date: '2026',
+    link: 'https://www.researchgate.net/publication/404748952_GUS_A_Graph_Utility_Score_Framework_for_Method_Selection_in_Fraud_Detection',
   },
   {
     title: 'Democratizing Pedagogical Content Creation: A Multi-Agent YouTube AI Framework for Empowering Indian Educators in Higher Education',
     venue: 'Intl. Conf. on Education and Learning with Artificial Intelligence (ICELAI-26)',
     date: '2026',
+    link: 'https://harbinengineeringjournal.com/index.php/journal/article/view/5141',
   },
 ];
 
@@ -46,7 +48,7 @@ const articles = [
   <ul class="card-list">
     {publications.map((item) => (
       <li>
-        <h3>{item.title}</h3>
+        <h3><a href={item.link} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
         <p class="meta">{item.venue} · {item.date}</p>
       </li>
     ))}
@@ -66,7 +68,7 @@ const articles = [
   <ul class="card-list">
     {articles.map((item) => (
       <li>
-        <h3><a href={item.link}>{item.title}</a></h3>
+        <h3><a href={item.link} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
       </li>
     ))}
   </ul>
