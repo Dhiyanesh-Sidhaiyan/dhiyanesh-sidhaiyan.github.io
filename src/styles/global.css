@@ -362,6 +362,65 @@ nav.site-nav a.active {
   }
 }
 
+/* --- Homepage feature grid --- */
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.feature-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  background: var(--bg-elevated);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.feature-icon {
+  font-size: 1.8rem;
+  display: inline-block;
+  margin-bottom: var(--space-2);
+}
+
+.feature-card h3 {
+  margin-bottom: 0.35rem;
+}
+
+.feature-card p {
+  margin-bottom: 0;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 640px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Skill row --- */
+
+.skill-section {
+  margin-top: var(--space-5);
+}
+
+.skill-row {
+  margin-top: var(--space-3);
+}
+
+.skill-row .tag {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.8rem;
+}
+
 footer.site-footer {
   margin-top: var(--space-6);
   padding-top: var(--space-3);

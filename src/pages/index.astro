@@ -1,5 +1,28 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const features = [
+  {
+    icon: '☁️',
+    title: 'Cloud & Backend',
+    text: "Microservices and APIs on AWS and GCP, built to hold up under real traffic — not just demo day.",
+  },
+  {
+    icon: '🧠',
+    title: 'AI & LLM Systems',
+    text: 'Agents, document intelligence, and automation that turn messy, unstructured input into decisions.',
+  },
+  {
+    icon: '🧩',
+    title: 'Full-Stack Product',
+    text: 'From React and Vue on the frontend to the databases underneath — I like owning the whole path.',
+  },
+];
+
+const skills = [
+  'Python', 'Node.js', 'TypeScript', 'React', 'Vue.js', 'AWS', 'GCP',
+  'Kubernetes', 'Docker', 'PostgreSQL', 'GraphQL', 'LangChain', 'LLMs', 'AI Agents',
+];
 ---
 
 <BaseLayout title="Home">
@@ -7,14 +30,31 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <p class="eyebrow">Software Engineer</p>
     <h1>Hi, I'm Dhiyanesh.</h1>
     <p class="lede">
-      I build systems that scale — and lately, systems that think. 7+ years engineering
-      cloud-native platforms on AWS and GCP, now pushing further into AI agents and
-      LLM-powered workflows.
+      I love turning gnarly, ambiguous problems into clean, scalable systems — and lately,
+      teaching those systems to think. Cloud-native architecture is my playground; AI
+      agents and automation are my newest obsession.
     </p>
     <div class="button-row">
       <a class="btn btn-primary" href="/projects">View Projects</a>
       <a class="btn btn-secondary" href="/blog">Read the Blog</a>
       <a class="btn btn-secondary" href="https://github.com/Dhiyanesh-Sidhaiyan">GitHub</a>
+    </div>
+  </section>
+
+  <section class="feature-grid">
+    {features.map((f) => (
+      <div class="feature-card">
+        <span class="feature-icon" role="img" aria-hidden="true">{f.icon}</span>
+        <h3>{f.title}</h3>
+        <p class="muted">{f.text}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="skill-section">
+    <h2>What I reach for</h2>
+    <div class="tags skill-row">
+      {skills.map((skill) => <span class="tag">{skill}</span>)}
     </div>
   </section>
 </BaseLayout>
