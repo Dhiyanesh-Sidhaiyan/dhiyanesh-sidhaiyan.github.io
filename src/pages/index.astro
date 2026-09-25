@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FeatureIcon from '../components/FeatureIcon.astro';
+import { Image } from 'astro:assets';
+import profileImg from '../img/profile.png';
 
 const features = [
   {
@@ -28,17 +30,22 @@ const skills = [
 
 <BaseLayout title="Home">
   <section class="hero">
-    <p class="eyebrow">Principal Full-Stack Software Engineer</p>
-    <h1>Hi, I'm Dhiyanesh.</h1>
-    <p class="lede">
-      I love turning complex, ambiguous problems into clean, scalable systems, end to end,
-      from the UI down to the infrastructure. Lately I'm teaching those systems to think:
-      AI agents and automation are my newest obsession.
-    </p>
-    <div class="button-row">
-      <a class="btn btn-primary" href="/experience">View Experience</a>
-      <a class="btn btn-secondary" href="/blog">Read the Blog</a>
-      <a class="btn btn-secondary" href="/resume.pdf" target="_blank" rel="noopener noreferrer">Résumé</a>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow">Full-Stack Software Engineer</p>
+        <h1>Hi, I'm Dhiyanesh.</h1>
+        <p class="lede">
+          I love turning complex, ambiguous problems into clean, scalable systems, end to end,
+          from the UI down to the infrastructure. Lately I'm teaching those systems to think:
+          AI agents and automation are my newest obsession.
+        </p>
+        <div class="button-row">
+          <a class="btn btn-primary" href="/experience">View Experience</a>
+          <a class="btn btn-secondary" href="/blog">Read the Blog</a>
+          <a class="btn btn-secondary" href="/resume.pdf" target="_blank" rel="noopener noreferrer">Résumé</a>
+        </div>
+      </div>
+      <Image src={profileImg} alt="Dhiyanesh Sidhaiyan" width={220} height={220} class="hero-photo" />
     </div>
   </section>
 

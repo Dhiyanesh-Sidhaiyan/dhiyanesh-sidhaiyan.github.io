@@ -219,6 +219,42 @@ nav.site-nav a.active {
   padding-bottom: var(--space-5);
 }
 
+.hero-grid {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.hero-text {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.hero-photo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .hero-grid {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .hero-photo {
+    width: 140px;
+    height: 140px;
+  }
+
+  .button-row {
+    justify-content: center;
+  }
+}
+
 .hero .eyebrow {
   color: var(--accent);
   font-weight: 600;
