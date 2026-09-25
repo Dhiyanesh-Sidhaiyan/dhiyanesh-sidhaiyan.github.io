@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const achievements = [
+  { title: 'Add your first achievement, certification, or talk here', date: '2026' },
+];
+---
+
+<BaseLayout title="Achievements">
+  <h1>Achievements</h1>
+  <ul class="card-list">
+    {achievements.map((item) => (
+      <li>
+        <h3>{item.title}</h3>
+        <p class="meta">{item.date}</p>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

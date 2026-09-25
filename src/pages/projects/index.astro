@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout title="Projects">
+  <h1>Projects</h1>
+  <ul class="card-list">
+    {projects.map((project) => (
+      <li>
+        <h3><a href={`/projects/${project.id}`}>{project.data.title}</a></h3>
+        <p class="meta">{project.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</p>
+        {project.data.description && <p>{project.data.description}</p>}
+        <div class="tags">
+          {project.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

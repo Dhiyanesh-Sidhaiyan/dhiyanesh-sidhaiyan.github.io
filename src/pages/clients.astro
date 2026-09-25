@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const clients = [
+  { name: 'Client or engagement name', outcome: 'One-line outcome, no confidential specifics.' },
+];
+---
+
+<BaseLayout title="Clients">
+  <h1>Clients</h1>
+  <p class="muted">A quick note on who I've worked with and the outcome delivered.</p>
+  <ul class="card-list">
+    {clients.map((client) => (
+      <li>
+        <h3>{client.name}</h3>
+        <p>{client.outcome}</p>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>

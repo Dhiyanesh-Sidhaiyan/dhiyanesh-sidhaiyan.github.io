@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const roles = [
+  {
+    company: 'Your Company',
+    title: 'Your Title',
+    period: '2024 — Present',
+    summary: 'One or two lines on what you owned and shipped.',
+  },
+];
+---
+
+<BaseLayout title="Experience">
+  <h1>Experience</h1>
+  <ul class="card-list">
+    {roles.map((role) => (
+      <li>
+        <h3>{role.title} · {role.company}</h3>
+        <p class="meta">{role.period}</p>
+        <p>{role.summary}</p>
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
