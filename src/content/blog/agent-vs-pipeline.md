@@ -26,6 +26,17 @@ The cases that justified agent autonomy shared one trait: the failure mode of be
 
 Automating a file's validation and retry logic is not that case, even though it touches AI-adjacent language like "automation." The steps are fixed. The variability is in the data, not the process. A pipeline with clear retry and alerting logic beats an agent here every time. It's auditable, it's fast, and it fails the same way twice, which matters enormously when the thing being automated has real consequences.
 
+As a decision tree:
+
+<pre class="mermaid">
+graph TD
+    A[New AI workflow] --> B{Does the next step depend on\nsomething unknowable in advance?}
+    B -->|No, steps are fixed| C[Use a Pipeline]
+    B -->|Yes, steps vary by case| D[Use an Agent]
+    C --> E[Auditable, fast, fails\nthe same way twice]
+    D --> F[Flexible, but costs\npredictability]
+</pre>
+
 ## A cheap test
 
 If the process fits on a whiteboard in five boxes and it doesn't change next week, an agent probably isn't needed. If the flowchart can't be drawn because the right next box depends on what the last box found, it might be.

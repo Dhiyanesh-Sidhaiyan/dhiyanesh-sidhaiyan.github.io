@@ -24,3 +24,13 @@ const { Content } = await render(post);
     <Content />
   </article>
 </BaseLayout>
+
+<script>
+  if (document.querySelector('.mermaid')) {
+    import('mermaid').then(({ default: mermaid }) => {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'neutral' });
+      mermaid.run();
+    });
+  }
+</script>

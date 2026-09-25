@@ -23,6 +23,17 @@ Explainability isn't a slide with a feature-importance plot. For a system used b
 - **Language, not math.** "Payment history and account age pulled this down" beats a feature-importance chart every time. Translate before you visualize.
 - **A path back to the raw data.** If someone doesn't believe the explanation, there needs to be a next click: the underlying record, not just a bigger chart.
 
+Here's what that path looks like end to end:
+
+<pre class="mermaid">
+graph LR
+    A[Raw signals] --> B[Model score]
+    B --> C[Explanation layer]
+    C --> D["Human-readable reasons\n(same factors, every time)"]
+    D --> E[Stakeholder trust]
+    D --> F[Link back to raw record]
+</pre>
+
 ## The trap: retrofitting explainability
 
 The systems that struggle here are the ones where explainability got added after the model was built, bolted on as a dashboard. It shows. The explanations feel disconnected from the actual decision logic because they are.

@@ -37,6 +37,18 @@ The answer was a Backend-for-Frontend layer, one clear seam between what the fro
 - The system's original assumptions about traffic shape, data model, or ownership no longer hold
 - You spend more time explaining the system than building on it
 
+Here's the decision as a flowchart:
+
+<pre class="mermaid">
+graph TD
+    A[System is slow to build on] --> B{Where does the pain show up?}
+    B -->|One isolated workflow| C[Patch it: feature flag, adapter, small fix]
+    B -->|Every team has its own workaround| D[Re-architect: new interface, e.g. a BFF]
+    D --> E[Route new traffic through the new layer]
+    E --> F[Keep old traffic working on old paths]
+    F --> G[Retire old paths as confidence builds]
+</pre>
+
 ## The part nobody likes
 
 Re-architecting is a bet, and bets should be sized. The BFF pattern worked because it let us re-architect incrementally: new traffic routes through the new layer, old traffic keeps working, and old paths retire as confidence builds. If a rewrite plan requires a big-bang cutover, that's not an architecture decision anymore, it's a risk-management problem, and it deserves to be treated as one.
