@@ -386,8 +386,8 @@ nav.site-nav a.active {
 }
 
 .feature-icon {
-  font-size: 1.8rem;
-  display: inline-block;
+  display: inline-flex;
+  color: var(--accent);
   margin-bottom: var(--space-2);
 }
 

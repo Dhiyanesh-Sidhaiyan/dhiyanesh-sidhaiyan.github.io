@@ -1,21 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import FeatureIcon from '../components/FeatureIcon.astro';
 
 const features = [
   {
-    icon: '☁️',
-    title: 'Cloud & Backend',
-    text: "Microservices and APIs on AWS and GCP, built to hold up under real traffic — not just demo day.",
+    icon: 'code' as const,
+    title: 'Frontend Engineering',
+    text: 'Clean, responsive UI in React and Vue - I care as much about the product feel as the API underneath it.',
   },
   {
-    icon: '🧠',
+    icon: 'server' as const,
+    title: 'Backend & Cloud',
+    text: 'Microservices and APIs on AWS and GCP, built to hold up under real traffic - not just demo day.',
+  },
+  {
+    icon: 'chip' as const,
     title: 'AI & LLM Systems',
     text: 'Agents, document intelligence, and automation that turn messy, unstructured input into decisions.',
-  },
-  {
-    icon: '🧩',
-    title: 'Full-Stack Product',
-    text: 'From React and Vue on the frontend to the databases underneath — I like owning the whole path.',
   },
 ];
 
@@ -27,12 +28,12 @@ const skills = [
 
 <BaseLayout title="Home">
   <section class="hero">
-    <p class="eyebrow">Software Engineer</p>
+    <p class="eyebrow">Full-Stack Software Engineer</p>
     <h1>Hi, I'm Dhiyanesh.</h1>
     <p class="lede">
-      I love turning gnarly, ambiguous problems into clean, scalable systems — and lately,
-      teaching those systems to think. Cloud-native architecture is my playground; AI
-      agents and automation are my newest obsession.
+      I love turning gnarly, ambiguous problems into clean, scalable systems - end to
+      end, from the UI down to the infrastructure. Lately I'm teaching those systems to
+      think: AI agents and automation are my newest obsession.
     </p>
     <div class="button-row">
       <a class="btn btn-primary" href="/projects">View Projects</a>
@@ -44,7 +45,7 @@ const skills = [
   <section class="feature-grid">
     {features.map((f) => (
       <div class="feature-card">
-        <span class="feature-icon" role="img" aria-hidden="true">{f.icon}</span>
+        <span class="feature-icon"><FeatureIcon name={f.icon} /></span>
         <h3>{f.title}</h3>
         <p class="muted">{f.text}</p>
       </div>
