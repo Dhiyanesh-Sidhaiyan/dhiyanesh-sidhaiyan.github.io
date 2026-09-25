@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SocialIcon from '../components/SocialIcon.astro';
 
 interface Props {
   title: string;
@@ -11,7 +12,7 @@ const navItems = [
   { href: '/experience', label: 'Experience' },
   { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
-  { href: '/achievements', label: 'Achievements' },
+  { href: '/research', label: 'Research' },
   { href: '/clients', label: 'Clients' },
 ];
 const currentPath = Astro.url.pathname;
@@ -37,6 +38,14 @@ const currentPath = Astro.url.pathname;
           {navItems.map((item) => (
             <a href={item.href} class={currentPath === item.href ? 'active' : ''}>{item.label}</a>
           ))}
+          <span class="social-links nav-social">
+            <a href="https://github.com/Dhiyanesh-Sidhaiyan" aria-label="GitHub" title="GitHub">
+              <SocialIcon name="github" />
+            </a>
+            <a href="https://www.linkedin.com/in/dhiyanesh-s/" aria-label="LinkedIn" title="LinkedIn">
+              <SocialIcon name="linkedin" />
+            </a>
+          </span>
         </nav>
       </div>
     </header>
@@ -45,7 +54,15 @@ const currentPath = Astro.url.pathname;
         <slot />
       </main>
       <footer class="site-footer">
-        © {new Date().getFullYear()} Dhiyanesh Sidhaiyan · <a href="https://github.com/Dhiyanesh-Sidhaiyan">GitHub</a>
+        <span>© {new Date().getFullYear()} Dhiyanesh Sidhaiyan</span>
+        <span class="social-links">
+          <a href="https://github.com/Dhiyanesh-Sidhaiyan" aria-label="GitHub" title="GitHub">
+            <SocialIcon name="github" />
+          </a>
+          <a href="https://www.linkedin.com/in/dhiyanesh-s/" aria-label="LinkedIn" title="LinkedIn">
+            <SocialIcon name="linkedin" />
+          </a>
+        </span>
       </footer>
     </div>
     <script>

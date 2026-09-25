@@ -146,6 +146,25 @@ nav.site-nav a.active {
   font-weight: 600;
 }
 
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.social-links a {
+  color: var(--muted);
+  display: inline-flex;
+}
+
+.social-links a:hover {
+  color: var(--text);
+}
+
+.nav-social {
+  margin-left: var(--space-1);
+}
+
 .nav-toggle {
   display: none;
   background: none;
@@ -349,4 +368,9 @@ footer.site-footer {
   border-top: 1px solid var(--border);
   font-size: 0.85rem;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
