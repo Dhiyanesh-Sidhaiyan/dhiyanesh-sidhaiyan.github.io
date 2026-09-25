@@ -23,26 +23,11 @@ const recognitions = [
     date: 'May 2026',
   },
 ];
-
-const articles = [
-  {
-    title: 'The Biggest AI Mistake Companies Are Making: Why You Should Use the Right Kind of Intelligence',
-    link: 'https://www.linkedin.com/pulse/biggest-ai-mistake-companies-making-why-you-should-use-sidhaiyan-h4jcc/',
-  },
-  {
-    title: 'Is GenAI Making Your Codebase a Ticking Time Bomb?',
-    link: 'https://www.linkedin.com/pulse/genai-making-your-codebase-ticking-time-bomb-dhiyanesh-sidhaiyan-y5dgc/',
-  },
-  {
-    title: 'The Day I Realized AI Agents Are Not the Future, But a Bridge',
-    link: 'https://www.linkedin.com/pulse/day-i-realized-ai-agents-future-bridge-dhiyanesh-sidhaiyan-dfoec/',
-  },
-];
 ---
 
 <BaseLayout title="Research">
   <h1>Research</h1>
-  <p class="muted">Published papers, competition results, and writing on AI and software engineering.</p>
+  <p class="muted">Published papers and competition results. For articles and technical writing, see the Blog.</p>
 
   <h2>Publications</h2>
   <ul class="card-list">
@@ -60,15 +45,6 @@ const articles = [
       <li>
         <h3>{item.title}</h3>
         <p class="meta">{item.venue} · {item.date}</p>
-      </li>
-    ))}
-  </ul>
-
-  <h2>Writing</h2>
-  <ul class="card-list">
-    {articles.map((item) => (
-      <li>
-        <h3><a href={item.link} target="_blank" rel="noopener noreferrer">{item.title}</a></h3>
       </li>
     ))}
   </ul>

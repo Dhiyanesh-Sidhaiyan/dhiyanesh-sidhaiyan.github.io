@@ -12,7 +12,13 @@ const posts = (await getCollection('blog')).sort(
   <ul class="card-list">
     {posts.map((post) => (
       <li>
-        <h3><a href={`/blog/${post.id}`}>{post.data.title}</a></h3>
+        <h3>
+          {post.data.link ? (
+            <a href={post.data.link} target="_blank" rel="noopener noreferrer">{post.data.title} ↗</a>
+          ) : (
+            <a href={`/blog/${post.id}`}>{post.data.title}</a>
+          )}
+        </h3>
         <p class="meta">{post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
         {post.data.description && <p>{post.data.description}</p>}
         <div class="tags">
