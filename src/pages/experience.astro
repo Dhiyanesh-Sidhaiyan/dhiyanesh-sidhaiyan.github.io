@@ -3,12 +3,52 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const roles = [
   {
-    company: 'Your Company',
-    title: 'Your Title',
-    period: '2024 — Present',
-    summary: 'One or two lines on what you owned and shipped.',
+    company: 'ACV Auctions',
+    title: 'Senior Software Engineer',
+    period: 'May 2024 — Present',
+    location: 'Chennai, India · Hybrid',
+    bullets: [
+      'Design and build solution architecture for large-scale, cloud-native auction platforms — backend and frontend systems on Python, Vue.js, AWS, and GCP.',
+      'Lead a 3-engineer team: own solutioning, review designs and code, and drive delivery from planning through production.',
+      'Designed an explainable AI-agent system to predict dealer defaults in real time, informing productization decisions with leadership.',
+      'Re-architected fragmented Salesforce workflows into a scalable BFF + microservices platform with a centralized risk tracker and real-time DataDog alerting.',
+      'Architected end-to-end NACHA payment automation with secure SFTP ingestion, validation, retries, and real-time Slack alerting.',
+      'Engineered a risk-scoring engine evaluating financial and behavioral signals for daily credit decisions, with explainable visualizations for non-technical stakeholders.',
+      'Integrated Finicity open-banking APIs and built a Gemini-OCR document-intelligence pipeline to cut down manual review effort.',
+    ],
+    tags: ['Python', 'AWS', 'GCP', 'Kubernetes', 'Docker', 'LLMs', 'AI Agents'],
+  },
+  {
+    company: 'HTC Global Services',
+    title: 'Senior Software Engineer',
+    period: 'Dec 2018 — May 2024',
+    location: 'Chennai, India · Hybrid',
+    bullets: [
+      'Built an end-to-end package-creation and booking platform with a discount engine, seasonal offers, and SES email automation; deployed BFF microservices via Terraform & CDK at 85%+ test coverage.',
+      'Delivered an Event Management System spanning virtual, webinar, seminar, and hybrid events across 8 categories with a multilingual Contentful CMS; reduced page load time by 40% via API optimization and lazy loading.',
+      'Led a 2-engineer team building an immersive Babylon.js gaming PoC with real-time WebSocket broadcasting, and modernized a legacy Flash-based leadership app.',
+      'Built multi-channel chatbots on Yellow Messenger (WhatsApp, Instagram, IVR, Facebook, email) and a full-stack audio-to-text app on AWS Transcribe with profanity filtering.',
+      'Client engagements included IDP Education, Michigan State University, yellow.ai, and Clix Capital — see the Clients page.',
+    ],
+    tags: ['Node.js', 'Python', 'AWS', 'MongoDB', 'GraphQL', 'Angular'],
+  },
+  {
+    company: 'Tech Mahindra',
+    title: 'Associate Engineer',
+    period: 'May 2017 — Feb 2018',
+    location: 'Chennai, India',
+    bullets: [
+      'Documented business processes (Visio, Lucidchart) and performed SQL/Excel data analysis to identify optimization opportunities, collaborating cross-functionally via Jira, Trello, and Confluence.',
+    ],
+    tags: ['SQL', 'Excel', 'Jira'],
   },
 ];
+
+const education = {
+  degree: 'B.E., Electrical & Electronics Engineering',
+  school: 'Shree Venkateshwara Hi-Tech Engineering College, Tamil Nadu',
+  period: '2013 — 2017',
+};
 ---
 
 <BaseLayout title="Experience">
@@ -17,9 +57,22 @@ const roles = [
     {roles.map((role) => (
       <li>
         <h3>{role.title} · {role.company}</h3>
-        <p class="meta">{role.period}</p>
-        <p>{role.summary}</p>
+        <p class="meta">{role.period} · {role.location}</p>
+        <ul>
+          {role.bullets.map((bullet) => <li>{bullet}</li>)}
+        </ul>
+        <div class="tags">
+          {role.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
       </li>
     ))}
+  </ul>
+
+  <h2>Education</h2>
+  <ul class="card-list">
+    <li>
+      <h3>{education.degree}</h3>
+      <p class="meta">{education.school} · {education.period}</p>
+    </li>
   </ul>
 </BaseLayout>

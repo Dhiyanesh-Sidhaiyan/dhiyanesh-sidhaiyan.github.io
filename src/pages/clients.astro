@@ -2,13 +2,16 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const clients = [
-  { name: 'Client or engagement name', outcome: 'One-line outcome, no confidential specifics.' },
+  { name: 'IDP Education', outcome: 'Built and maintained chatbot and web services. Node.js, AWS, React, Terraform.' },
+  { name: 'Michigan State University', outcome: 'Developed backend services and integrations. Node.js, MongoDB, AWS.' },
+  { name: 'yellow.ai', outcome: 'Worked on conversational AI platforms, scalable microservices, and cloud deployments.' },
+  { name: 'Clix Capital', outcome: 'Developed fintech applications. Python, Flask, Django REST, MySQL.' },
 ];
 ---
 
 <BaseLayout title="Clients">
   <h1>Clients</h1>
-  <p class="muted">A quick note on who I've worked with and the outcome delivered.</p>
+  <p class="muted">Engagements from my time at HTC Global Services.</p>
   <ul class="card-list">
     {clients.map((client) => (
       <li>
