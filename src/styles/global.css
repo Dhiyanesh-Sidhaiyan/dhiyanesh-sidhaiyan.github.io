@@ -362,6 +362,15 @@ nav.site-nav a.active {
   }
 }
 
+/* --- Pagination --- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-5);
+}
+
 /* --- Homepage feature grid --- */
 
 .feature-grid {

@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import type { GetStaticPaths, Page } from 'astro';
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = (await getCollection('blog')).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+  return paginate(posts, { pageSize: 10 });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props as { page: Page<CollectionEntry<'blog'>> };
+---
+
+<BaseLayout title="Blog">
+  <h1>Blog</h1>
+  <ul class="card-list">
+    {page.data.map((post) => (
+      <li>
+        <h3>
+          {post.data.link ? (
+            <a href={post.data.link} target="_blank" rel="noopener noreferrer">{post.data.title} ↗</a>
+          ) : (
+            <a href={`/blog/${post.id}`}>{post.data.title}</a>
+          )}
+        </h3>
+        <p class="meta">{post.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        {post.data.description && <p>{post.data.description}</p>}
+        <div class="tags">
+          {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <nav class="pagination" aria-label="Blog pages">
+    {page.url.prev ? <a href={page.url.prev} class="btn btn-secondary">← Newer</a> : <span />}
+    <span class="meta">Page {page.currentPage} of {page.lastPage}</span>
+    {page.url.next ? <a href={page.url.next} class="btn btn-secondary">Older →</a> : <span />}
+  </nav>
+</BaseLayout>
