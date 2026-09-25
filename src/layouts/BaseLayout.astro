@@ -7,13 +7,11 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Dhiyanesh Sidhaiyan - engineer, builder." } = Astro.props;
+const { title, description = "Dhiyanesh Sidhaiyan, engineer and builder." } = Astro.props;
 const navItems = [
   { href: '/experience', label: 'Experience' },
-  { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
   { href: '/research', label: 'Research' },
-  { href: '/clients', label: 'Clients' },
 ];
 const currentPath = Astro.url.pathname;
 ---
