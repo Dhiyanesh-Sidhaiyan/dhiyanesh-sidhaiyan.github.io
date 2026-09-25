@@ -8,7 +8,6 @@ interface Props {
 
 const { title, description = "Dhiyanesh Sidhaiyan — engineer, builder." } = Astro.props;
 const navItems = [
-  { href: '/', label: 'Home' },
   { href: '/experience', label: 'Experience' },
   { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
@@ -28,12 +27,20 @@ const currentPath = Astro.url.pathname;
     <title>{title} · Dhiyanesh Sidhaiyan</title>
   </head>
   <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="/" class="brand">Dhiyanesh Sidhaiyan</a>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+          Menu
+        </button>
+        <nav class="site-nav" id="site-nav">
+          {navItems.map((item) => (
+            <a href={item.href} class={currentPath === item.href ? 'active' : ''}>{item.label}</a>
+          ))}
+        </nav>
+      </div>
+    </header>
     <div class="wrapper">
-      <nav class="site-nav">
-        {navItems.map((item) => (
-          <a href={item.href} class={currentPath === item.href ? 'active' : ''}>{item.label}</a>
-        ))}
-      </nav>
       <main>
         <slot />
       </main>
@@ -41,5 +48,14 @@ const currentPath = Astro.url.pathname;
         © {new Date().getFullYear()} Dhiyanesh Sidhaiyan · <a href="https://github.com/Dhiyanesh-Sidhaiyan">GitHub</a>
       </footer>
     </div>
+    <script>
+      const toggle = document.getElementById('nav-toggle');
+      const nav = document.getElementById('site-nav');
+      toggle?.addEventListener('click', () => {
+        const open = nav?.getAttribute('data-open') === 'true';
+        nav?.setAttribute('data-open', open ? 'false' : 'true');
+        toggle.setAttribute('aria-expanded', open ? 'false' : 'true');
+      });
+    </script>
   </body>
 </html>

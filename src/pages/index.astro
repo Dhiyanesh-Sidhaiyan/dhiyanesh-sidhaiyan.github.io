@@ -3,10 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Home">
-  <h1>Dhiyanesh Sidhaiyan</h1>
-  <p class="muted">Software engineer. I build tools, ship side projects, and write about what I learn along the way.</p>
-  <p>
-    <a href="/projects">See my projects →</a> &nbsp;·&nbsp;
-    <a href="/blog">Read the blog →</a>
-  </p>
+  <section class="hero">
+    <p class="eyebrow">Software Engineer</p>
+    <h1>Hi, I'm Dhiyanesh.</h1>
+    <p class="lede">
+      I build tools, ship side projects, and write about what I learn along the way.
+      This site is where I keep track of it all.
+    </p>
+    <div class="button-row">
+      <a class="btn btn-primary" href="/projects">View Projects</a>
+      <a class="btn btn-secondary" href="/blog">Read the Blog</a>
+      <a class="btn btn-secondary" href="https://github.com/Dhiyanesh-Sidhaiyan">GitHub</a>
+    </div>
+  </section>
 </BaseLayout>

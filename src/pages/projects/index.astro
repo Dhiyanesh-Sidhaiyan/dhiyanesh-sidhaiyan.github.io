@@ -9,7 +9,7 @@ const projects = (await getCollection('projects')).sort(
 
 <BaseLayout title="Projects">
   <h1>Projects</h1>
-  <ul class="card-list">
+  <ul class="card-list card-grid">
     {projects.map((project) => (
       <li>
         <h3><a href={`/projects/${project.id}`}>{project.data.title}</a></h3>
