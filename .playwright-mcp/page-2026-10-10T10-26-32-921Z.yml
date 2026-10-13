@@ -1,0 +1,251 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Dhiyanesh Sidhaiyan" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=e5]:
+        - link "Experience" [ref=e6] [cursor=pointer]:
+          - /url: /experience
+        - link "Blog" [ref=e7] [cursor=pointer]:
+          - /url: /blog
+        - link "Research" [ref=e8] [cursor=pointer]:
+          - /url: /research
+        - generic [ref=e9]:
+          - link "GitHub" [ref=e10] [cursor=pointer]:
+            - /url: https://github.com/Dhiyanesh-Sidhaiyan
+          - link "LinkedIn" [ref=e13] [cursor=pointer]:
+            - /url: https://www.linkedin.com/in/dhiyanesh-s/
+  - generic [ref=e16]:
+    - main [ref=e17]:
+      - article [ref=e18]:
+        - 'heading "The LLM Is a Backend Dependency: Engineering It Like One" [level=1] [ref=e19]'
+        - paragraph [ref=e20]: October 10, 2026
+        - generic [ref=e21]:
+          - generic [ref=e22]: ai
+          - generic [ref=e23]: architecture
+          - generic [ref=e24]: backend
+        - paragraph [ref=e25]: "Most teams ship their first LLM feature the way they’d build a demo: write a prompt, call the API, parse the JSON, and hope. It works in the sprint review. Then real traffic arrives, and the incidents start to look familiar."
+        - paragraph [ref=e26]:
+          - text: They look familiar because they are. An LLM is a remote service that is
+          - strong [ref=e27]: slow
+          - text: ","
+          - strong [ref=e28]: sometimes wrong
+          - text: ","
+          - strong [ref=e29]: charged per use
+          - text: ", and"
+          - strong [ref=e30]: updated by someone else
+          - text: ". We already know how to build around services like that: payment gateways, search clusters, third-party APIs. The mistake is treating the model as magic instead of as infrastructure."
+        - heading "The short version" [level=2] [ref=e31]
+        - paragraph [ref=e32]: "If you only read one section, read this one:"
+        - table [ref=e33]:
+          - rowgroup [ref=e34]:
+            - row [ref=e35]:
+              - columnheader "Problem" [ref=e36]
+              - columnheader "What to do" [ref=e37]
+          - rowgroup [ref=e38]:
+            - row [ref=e39]:
+              - cell "Output is unpredictable" [ref=e40]
+              - cell "Define a strict output shape and validate every response" [ref=e41]
+            - row [ref=e42]:
+              - cell "Calls are slow" [ref=e43]
+              - cell "Give each route a time budget; stream, queue, or batch" [ref=e44]
+            - row [ref=e45]:
+              - cell "Calls fail" [ref=e46]
+              - cell "Retry the safe errors, and keep side effects out of the model call" [ref=e47]
+            - row [ref=e48]:
+              - cell "The model can be down or refuse" [ref=e49]
+              - cell "Have a planned backup path" [ref=e50]
+            - row [ref=e51]:
+              - cell "Costs drift" [ref=e52]
+              - cell "Track cost per finished task, and cache stable prompt content" [ref=e53]
+            - row [ref=e54]:
+              - cell "Prompt changes break things" [ref=e55]
+              - cell "Test prompts with evals, like unit tests" [ref=e56]
+            - row [ref=e57]:
+              - cell "Model versions change" [ref=e58]
+              - cell "Pin versions and roll out upgrades like deploys" [ref=e59]
+            - row [ref=e60]:
+              - cell "Inputs can be malicious" [ref=e61]
+              - cell "Treat the model as untrusted and limit what it can do" [ref=e62]
+        - heading "Where the model sits" [level=2] [ref=e63]
+        - paragraph [ref=e64]: Think of the model as one box in your architecture, not the center of it. Your service owns the rules. The model just helps with one step.
+        - generic [ref=e65]: graph LR U[User or job] --> S[Your service] S --> G[LLM gateway\ntimeouts, retries, budgets, logging] G --> M1[Primary model] G -.->|backup| M2[Fallback model] G --> V[Schema validator] V --> S S --> DB[(Database)] S --> X[Side effects\nemail, payments, updates]
+        - paragraph [ref=e66]:
+          - text: The important box is the
+          - strong [ref=e67]: gateway
+          - text: ": one thin layer that every model call goes through. It’s where timeouts, retries, cost limits, and logging live, so individual features don’t each reinvent them."
+        - heading "1. Start with the contract, not the prompt" [level=2] [ref=e68]
+        - paragraph [ref=e69]:
+          - text: The prompt is an implementation detail. The
+          - strong [ref=e70]: contract
+          - text: "is what the rest of your system depends on: the exact shape of what comes back."
+        - paragraph [ref=e71]: "A weak contract: “the model returns a category.”"
+        - paragraph [ref=e72]:
+          - text: "A strong contract: “the model returns one of six categories or"
+          - code [ref=e73]: unknown
+          - text: ", and"
+          - code [ref=e74]: unknown
+          - text: goes to a human queue.”
+        - paragraph [ref=e75]: "That second version tells every caller exactly what to expect, including what happens when the model isn’t sure. In practice:"
+        - list [ref=e76]:
+          - listitem [ref=e77]:
+            - strong [ref=e78]: Ask for structured output.
+            - text: Use the provider’s JSON or schema mode, and validate anyway. Parsing free text with regex is a bug you’ve scheduled for later.
+          - listitem [ref=e79]:
+            - strong [ref=e80]: Give the model a way to say “I don’t know.”
+            - text: If your schema can’t express uncertainty, the model will express it by being confidently wrong.
+          - listitem [ref=e81]:
+            - strong [ref=e82]: Treat the output as untrusted input.
+            - text: Check it before it touches a database, the same way you’d check a form submission.
+        - generic [ref=e83]: "graph LR A[Model output] --> B{Matches schema?} B -->|No| R[Reject and retry\\nor fall back] B -->|Yes| C{Value is unknown?} C -->|Yes| H[Human queue] C -->|No| D[Use the result]"
+        - paragraph [ref=e84]: Once the contract is fixed, you can change the prompt freely behind it. That’s the point.
+        - heading "2. Design for the latency you actually have" [level=2] [ref=e85]
+        - paragraph [ref=e86]: A model call is not a database read. It can take under a second or several minutes, depending on how much text goes in, how much comes out, and how much reasoning is involved. Design for the slow cases, not the average.
+        - paragraph [ref=e87]: "Pick a pattern based on who is waiting:"
+        - generic [ref=e88]: "graph TD A[New LLM route] --> B{Is a person\\nwaiting on screen?} B -->|Yes| C[Stream the response\\nshow progress early] B -->|No| D{Needed within\\nminutes?} D -->|Yes| E[Background queue\\nreturn a job ID] D -->|No| F[Batch API\\ncheaper, runs later]"
+        - paragraph [ref=e89]: "Two habits help:"
+        - list [ref=e90]:
+          - listitem [ref=e91]:
+            - strong [ref=e92]: Set timeouts on purpose.
+            - text: SDK defaults are often generous (ten minutes is common). A user-facing request should never inherit that.
+          - listitem [ref=e93]:
+            - strong [ref=e94]: Batch what isn’t urgent.
+            - text: Overnight enrichment and bulk classification don’t need real-time pricing. Most providers offer a batch API at a discount.
+        - paragraph [ref=e95]: If you can’t say what a route’s time budget is, it isn’t ready for a model.
+        - heading "3. Retries, idempotency, and side effects" [level=2] [ref=e96]
+        - paragraph [ref=e97]: "Model calls fail like any network call: rate limits, overloaded servers, timeouts, dropped streams. The usual rules apply, and they matter more because every attempt costs money."
+        - list [ref=e98]:
+          - listitem [ref=e99]:
+            - strong [ref=e100]: Retry only what can succeed next time.
+            - text: A rate limit (429) or server error (5xx) is worth retrying with backoff. A bad request (400) will fail the same way again.
+          - listitem [ref=e101]:
+            - strong [ref=e102]: Cap total attempts.
+            - text: A retry storm against a paid API turns an outage into an invoice.
+          - listitem [ref=e103]:
+            - strong [ref=e104]: Never let the model call and the side effect happen in one step.
+            - text: Save the model’s decision first, then perform the action in a way that is safe to repeat.
+        - paragraph [ref=e105]: "Here’s what that looks like:"
+        - generic [ref=e106]: "sequenceDiagram participant S as Your service participant M as Model participant DB as Database participant E as Email service S->>M: Classify this request M-->>S: category = refund S->>DB: Save decision with request ID S->>E: Send email with idempotency key Note over S,E: If the email fails, retry only that step"
+        - paragraph [ref=e107]: If the email step fails, only that step is retried. The saved decision means the model isn’t called twice, and the idempotency key means the customer never gets two emails.
+        - paragraph [ref=e108]:
+          - text: I’ve written before about
+          - link "idempotence" [ref=e109] [cursor=pointer]:
+            - /url: /blog/idempotence-in-software-design
+          - text: and
+          - link "atomicity" [ref=e110] [cursor=pointer]:
+            - /url: /blog/atomicity-in-software-design
+          - text: . Both matter more with LLMs, not less.
+        - heading "4. Plan the backup path before you need it" [level=2] [ref=e111]
+        - paragraph [ref=e112]:
+          - text: "Every LLM feature needs an answer to one question:"
+          - strong [ref=e113]: what happens when the model is down, slow, or refuses?
+          - text: "There are only a few good answers:"
+        - list [ref=e114]:
+          - listitem [ref=e115]:
+            - strong [ref=e116]: A fallback model.
+            - text: Another model that meets the same contract. It must pass the same tests, or it isn’t a fallback, it’s a gamble.
+          - listitem [ref=e117]:
+            - strong [ref=e118]: A simple rule.
+            - text: A rule, a cached result, or the last known good answer. Less clever, always available.
+          - listitem [ref=e119]:
+            - strong [ref=e120]: Hide the feature.
+            - text: The AI part disappears and the main workflow keeps working. Often right for “assistant” features.
+          - listitem [ref=e121]:
+            - strong [ref=e122]: Send it to a person.
+            - text: For decisions that matter, a human queue is a valid backup, not a failure.
+        - paragraph [ref=e123]: What’s not acceptable is the AI feature failing and taking the surrounding workflow down with it.
+        - paragraph [ref=e124]: "The full request flow I default to:"
+        - generic [ref=e125]: "graph TD A[Request] --> B{Cached answer?} B -->|Yes| Z[Return cached result] B -->|No| C[Call primary model\\nwith timeout and budget] C --> D{Valid against schema?} D -->|Yes| E[Save decision] D -->|No or refused| F{Backup available?} C -->|Timeout or error| F F -->|Yes| G[Fallback model\\nsame contract] G --> D F -->|No| H[Simple rule\\nor human queue] E --> I[Run side effects\\nsafely, once]"
+        - heading "5. Cost is a capacity metric" [level=2] [ref=e126]
+        - paragraph [ref=e127]: With most services, someone reviews cost once a quarter. With LLMs, cost changes every time someone edits a prompt, so watch it the way you watch latency.
+        - list [ref=e128]:
+          - listitem [ref=e129]:
+            - strong [ref=e130]: Measure cost per finished task, not per call.
+            - text: A cheap call that needs three retries isn’t cheap.
+          - listitem [ref=e131]:
+            - strong [ref=e132]: Make prompts cache-friendly.
+            - text: Providers cache prompts by matching the beginning of the text exactly. Put the parts that never change first and the parts that change every time last.
+          - listitem [ref=e133]:
+            - strong [ref=e134]: Use only as much reasoning as the task needs.
+            - text: Simple classification doesn’t need the same depth as a multi-step agent. Many models let you tune this per request.
+          - listitem [ref=e135]:
+            - strong [ref=e136]: Set budgets per customer and per feature.
+            - text: Hard limits stop one runaway loop from eating the month.
+        - paragraph [ref=e137]: "How prompt ordering affects caching:"
+        - generic [ref=e138]: graph LR subgraph Good[Cache-friendly order] A1[Instructions\nnever change] --> A2[Tool definitions\nrarely change] --> A3[Reference docs\nchange daily] --> A4[User question\nchanges every call] end subgraph Bad[Cache-breaking order] B1[Current timestamp\nchanges every call] --> B2[Instructions] --> B3[Tool definitions] --> B4[User question] end
+        - paragraph [ref=e139]: In the second version, the timestamp at the top changes every call, so nothing after it can be reused. One line in the wrong place can quietly multiply your bill.
+        - paragraph [ref=e140]: The cheapest token is the one you don’t send. Cutting context the model doesn’t need usually saves more than switching to a cheaper model.
+        - heading "6. Evals are your test suite" [level=2] [ref=e141]
+        - paragraph [ref=e142]:
+          - text: You wouldn’t ship a parser without tests. A prompt is a parser for natural language, so it needs tests too. In the LLM world these are called
+          - strong [ref=e143]: evals
+          - text: .
+        - paragraph [ref=e144]: An eval set is a fixed list of real inputs with known good answers (or clear grading rules). It runs automatically every time the prompt, the model, or the schema changes.
+        - list [ref=e145]:
+          - listitem [ref=e146]:
+            - strong [ref=e147]: Use real inputs, including messy ones.
+            - text: Pull examples from production (with proper data handling), not from what you imagine users send.
+          - listitem [ref=e148]:
+            - strong [ref=e149]: Grade against the contract.
+            - text: Is the output valid? Is the category right? Did it say
+            - code [ref=e150]: unknown
+            - text: when it should have?
+          - listitem [ref=e151]:
+            - strong [ref=e152]: Track one score over time.
+            - text: A regression should show up as a drop on a chart, not as a support ticket.
+        - paragraph [ref=e153]: Without evals, every prompt edit is a guess, and “it worked on the three examples I tried” is how regressions ship.
+        - heading "7. Prompts and models are deploys" [level=2] [ref=e154]
+        - paragraph [ref=e155]: "A prompt change can change behavior as much as a code change. Treat it the same way: version control, review, automated tests, and a rollout plan."
+        - paragraph [ref=e156]:
+          - text: The model itself changes too. Providers release new versions and retire old ones.
+          - strong [ref=e157]: Pin an exact model version
+          - text: "in config, never a name that silently points to something new, and treat upgrades like migrations:"
+        - generic [ref=e158]: "graph LR A[Prompt or model\\nchange] --> B[Code review] B --> C[Run evals in CI] C --> D{Score held or\\nimproved?} D -->|No| A D -->|Yes| E[Compare cost\\nand latency] E --> F[Canary on a small\\nslice of traffic] F --> G{Metrics healthy?} G -->|No| H[Roll back] G -->|Yes| I[Full rollout]"
+        - paragraph [ref=e159]: Log the prompt version and model version on every call. When someone asks why an answer changed last Tuesday, that’s the only way to find out.
+        - heading "8. Observability you’ll actually use" [level=2] [ref=e160]
+        - paragraph [ref=e161]: "Normal monitoring tells you a call was slow. For model calls, also track:"
+        - list [ref=e162]:
+          - listitem [ref=e163]:
+            - strong [ref=e164]: "Tokens and cost:"
+            - text: input, output, and cached tokens per call
+          - listitem [ref=e165]:
+            - strong [ref=e166]: "Versions:"
+            - text: which model and which prompt version answered
+          - listitem [ref=e167]:
+            - strong [ref=e168]: "Stop reason:"
+            - text: did the model finish normally, hit the length limit, refuse, or call a tool?
+          - listitem [ref=e169]:
+            - strong [ref=e170]: "Validation failures and fallback usage:"
+            - text: as real metrics, with alerts
+          - listitem [ref=e171]:
+            - strong [ref=e172]: "Sampled traces:"
+            - text: a small, access-controlled sample of inputs and outputs for debugging
+        - paragraph [ref=e173]: Stop reasons are the underrated one. If more responses start getting cut off or refused, something upstream changed, and you want to know before users do.
+        - heading "9. The trust boundary" [level=2] [ref=e174]
+        - paragraph [ref=e175]:
+          - text: "Anything the model reads can try to steer it: user messages, retrieved documents, tool results, web pages. This is called"
+          - strong [ref=e176]: prompt injection
+          - text: ", and you can’t fix it with better wording. It’s a security boundary problem."
+        - generic [ref=e177]: "graph LR subgraph Untrusted[Untrusted zone] I1[User input] I2[Retrieved documents] I3[Tool and web results] M[Model] I1 --> M I2 --> M I3 --> M end subgraph Trusted[Trusted zone: your code] V[Validation and\\npermission checks] A[Actions\\nwrites, payments, emails] end M --> V V -->|Allowed| A V -->|Risky| H[Human approval] H --> A"
+        - paragraph [ref=e178]:
+          - text: "The rule:"
+          - strong [ref=e179]: the model can suggest, but your code decides.
+        - list [ref=e180]:
+          - listitem [ref=e181]: Give the model only the permissions the task needs. A summarizer doesn’t need write access.
+          - listitem [ref=e182]: Put important actions behind code checks or human approval, outside the model’s control.
+          - listitem [ref=e183]: Never put secrets in a prompt. Anything in the prompt can end up in the output.
+          - listitem [ref=e184]: Don’t send sensitive data the task doesn’t need, and know your provider’s data retention terms.
+        - heading "The question that matters" [level=2] [ref=e185]
+        - paragraph [ref=e186]: The question isn’t “which model is best?” Models keep getting better and cheaper, and that answer changes every quarter.
+        - paragraph [ref=e187]:
+          - text: "The lasting question is:"
+          - strong [ref=e188]: if we swapped this model out tomorrow, what would break?
+        - paragraph [ref=e189]: If the answer is “we’d have to rewrite the feature,” the model has leaked into your architecture. If the answer is “we’d run the evals, check the cost dashboard, and canary it,” the system was built right.
+        - paragraph [ref=e190]: Engineer the boundary, and the model becomes just another dependency. That’s the goal.
+    - contentinfo [ref=e191]:
+      - generic [ref=e192]: © 2026 Dhiyanesh Sidhaiyan
+      - generic [ref=e193]:
+        - link "GitHub" [ref=e194] [cursor=pointer]:
+          - /url: https://github.com/Dhiyanesh-Sidhaiyan
+        - link "LinkedIn" [ref=e197] [cursor=pointer]:
+          - /url: https://www.linkedin.com/in/dhiyanesh-s/

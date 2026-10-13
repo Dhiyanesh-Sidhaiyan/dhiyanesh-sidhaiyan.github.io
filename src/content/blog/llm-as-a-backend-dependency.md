@@ -255,3 +255,5 @@ The lasting question is: **if we swapped this model out tomorrow, what would bre
 If the answer is "we'd have to rewrite the feature," the model has leaked into your architecture. If the answer is "we'd run the evals, check the cost dashboard, and canary it," the system was built right.
 
 Engineer the boundary, and the model becomes just another dependency. That's the goal.
+
+*Want to see this applied end to end? Read the companion [case study: how one team turned a fragile LLM feature into infrastructure](/blog/llm-backend-case-study-ticket-triage).*
