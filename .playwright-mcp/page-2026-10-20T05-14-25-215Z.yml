@@ -1,0 +1,407 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link "Dhiyanesh Sidhaiyan" [ref=f1e4] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f1e5]:
+        - link "Experience" [ref=f1e6] [cursor=pointer]:
+          - /url: /experience
+        - link "Blog" [ref=f1e7] [cursor=pointer]:
+          - /url: /blog
+        - link "Research" [ref=f1e8] [cursor=pointer]:
+          - /url: /research
+        - generic [ref=f1e9]:
+          - link "GitHub" [ref=f1e10] [cursor=pointer]:
+            - /url: https://github.com/Dhiyanesh-Sidhaiyan
+          - link "LinkedIn" [ref=f1e13] [cursor=pointer]:
+            - /url: https://www.linkedin.com/in/dhiyanesh-s/
+  - generic [ref=f1e16]:
+    - main [ref=f1e17]:
+      - article [ref=f1e18]:
+        - 'heading "Where AI Agents Get Slow and Expensive: Performance and Scale in Practice" [level=1] [ref=f1e19]'
+        - paragraph [ref=f1e20]: October 20, 2026
+        - generic [ref=f1e21]:
+          - generic [ref=f1e22]: ai
+          - generic [ref=f1e23]: architecture
+          - generic [ref=f1e24]: performance
+          - generic [ref=f1e25]: backend
+        - paragraph [ref=f1e26]: The first agent demo always feels fast. One question, a few tool calls, a good answer in fifteen seconds. Then it goes to a hundred users, then a thousand, and the same agent takes two minutes, hits rate limits at lunchtime, and costs more per task than the person it was meant to help.
+        - paragraph [ref=f1e27]:
+          - text: Nothing changed in the code. What changed is that agent performance problems
+          - strong [ref=f1e28]: compound
+          - text: . Each one is small on its own. Multiplied across steps, users, and retries, they become the whole story.
+        - paragraph [ref=f1e29]:
+          - text: This post is about where that compounding happens and what actually helps. If you haven’t decided yet whether you need an agent at all, start with
+          - link "Agent vs. Pipeline" [ref=f1e30] [cursor=pointer]:
+            - /url: /blog/agent-vs-pipeline
+          - text: . Most performance problems are cheapest to solve by not having them.
+        - heading "Why agents are different from a single LLM call" [level=2] [ref=f1e31]
+        - paragraph [ref=f1e32]:
+          - text: A single model call has one latency and one cost. An agent is a
+          - strong [ref=f1e33]: loop
+          - text: ": the model thinks, calls a tool, reads the result, and decides again. Every trip around the loop re-sends the growing conversation."
+        - document [ref=f1e35]:
+          - generic [ref=f1e37]:
+            - generic [ref=f1e44]:
+              - paragraph [ref=f1e50]: "No"
+              - paragraph [ref=f1e56]: "Yes"
+            - generic [ref=f1e57]:
+              - paragraph [ref=f1e64]: Task
+              - paragraph [ref=f1e71]: Model decidesnext step
+              - paragraph [ref=f1e78]: Done?
+              - paragraph [ref=f1e85]: Call a tool
+              - paragraph [ref=f1e92]: Append resultto context
+              - paragraph [ref=f1e99]: Answer
+        - paragraph [ref=f1e100]: "That loop creates three effects that don’t exist in normal backend code:"
+        - list [ref=f1e101]:
+          - listitem [ref=f1e102]:
+            - strong [ref=f1e103]: Latency adds up per step,
+            - text: and you don’t know how many steps there will be.
+          - listitem [ref=f1e104]:
+            - strong [ref=f1e105]: Context grows every step,
+            - text: so each step is slower and more expensive than the one before.
+          - listitem [ref=f1e106]:
+            - strong [ref=f1e107]: One user request becomes many model calls,
+            - text: so capacity planning in “requests per second” stops making sense.
+        - paragraph [ref=f1e108]: Most agent performance work is managing those three things.
+        - 'heading "1. Latency: the step count is the real enemy" [level=2] [ref=f1e109]'
+        - heading "The basic math" [level=3] [ref=f1e110]
+        - paragraph [ref=f1e111]: "Say each step takes about 3 seconds of model time and 1.5 seconds of tool time. A 12-step task:"
+        - blockquote [ref=f1e112]:
+          - paragraph [ref=f1e113]:
+            - text: 12 steps × (3s + 1.5s) =
+            - strong [ref=f1e114]: 54 seconds
+        - paragraph [ref=f1e115]: There’s no single slow component to optimize. Every part is “fine.” The total isn’t.
+        - paragraph [ref=f1e116]:
+          - text: The biggest lever is almost never making one step faster. It’s
+          - strong [ref=f1e117]: taking steps out
+          - text: ":"
+        - list [ref=f1e118]:
+          - listitem [ref=f1e119]:
+            - strong [ref=f1e120]: Give tools more power per call.
+            - text: A
+            - code [ref=f1e121]: search_orders(customer, status, date_range)
+            - text: tool replaces three calls to
+            - code [ref=f1e122]: get_customer
+            - text: ","
+            - code [ref=f1e123]: list_orders
+            - text: ", and"
+            - code [ref=f1e124]: filter_orders
+            - text: . Fine-grained tools feel clean to design and are slow to use.
+          - listitem [ref=f1e125]:
+            - strong [ref=f1e126]: Let the model call tools in parallel.
+            - text: Most current models can request several tool calls in one turn. If your tool runner executes them one after another, you’ve thrown that away.
+          - listitem [ref=f1e127]:
+            - strong [ref=f1e128]: Do the predictable parts in code.
+            - text: If every task starts by loading the user’s account, load it before the loop starts and put it in the prompt. Don’t make the model spend a step asking for it.
+        - paragraph [ref=f1e129]: "Here’s the same work done serially and in parallel:"
+        - document [ref=f1e131]:
+          - generic [ref=f1e133]:
+            - generic [ref=f1e134]:
+              - paragraph [ref=f1e141]: "Parallel: about 8s"
+              - paragraph [ref=f1e148]: "Serial: about 18s"
+            - generic [ref=f1e154]:
+              - paragraph [ref=f1e161]: "Model: plan3s"
+              - paragraph [ref=f1e168]: "Tool: orders2s"
+              - paragraph [ref=f1e175]: Model3s
+              - paragraph [ref=f1e182]: "Tool: invoices2s"
+              - paragraph [ref=f1e189]: Model3s
+              - paragraph [ref=f1e196]: "Tool: tickets2s"
+              - paragraph [ref=f1e203]: "Model: answer3s"
+              - paragraph [ref=f1e210]: "Model: plan3s"
+              - paragraph [ref=f1e217]: "Tool: orders2s"
+              - paragraph [ref=f1e224]: "Tool: invoices2s"
+              - paragraph [ref=f1e231]: "Tool: tickets2s"
+              - paragraph [ref=f1e238]: "Model: answer3s"
+        - paragraph [ref=f1e239]: Same tools, same model, less than half the time. And two fewer model calls, each re-sending the whole conversation, means lower cost too.
+        - heading "Tail latency multiplies" [level=3] [ref=f1e240]
+        - paragraph [ref=f1e241]: "Averages hide the real problem. Suppose any single step has a 1 in 100 chance of being slow (a cold tool, a provider hiccup, a long model response). For one call, that’s rare. For a 20-step agent:"
+        - blockquote [ref=f1e242]:
+          - paragraph [ref=f1e243]:
+            - text: Chance at least one step is slow = 1 − 0.99²⁰ ≈
+            - strong [ref=f1e244]: 18%
+        - paragraph [ref=f1e245]:
+          - text: Nearly one in five tasks hits a slow step. Your agent’s typical experience is shaped by the
+          - emphasis [ref=f1e246]: worst
+          - text: step, not the average one. This is why agents that look fine in a benchmark feel sluggish in production.
+        - paragraph [ref=f1e247]: "What helps:"
+        - list [ref=f1e248]:
+          - listitem [ref=f1e249]:
+            - strong [ref=f1e250]: Per-step timeouts,
+            - text: not just a timeout on the whole task. A tool that normally takes 200ms and is now taking 20 seconds should fail fast and let the model try something else.
+          - listitem [ref=f1e251]:
+            - strong [ref=f1e252]: Hedge slow, safe reads.
+            - text: For read-only tools with high tail latency, sending a second request after a short delay and taking whichever returns first is cheap insurance.
+          - listitem [ref=f1e253]:
+            - strong [ref=f1e254]: Stream progress to the user.
+            - text: If a task truly needs 40 seconds, showing “searching invoices…” changes how long it
+            - emphasis [ref=f1e255]: feels
+            - text: ", even though it doesn’t change how long it takes."
+        - 'heading "2. Context growth: the cost curve nobody draws" [level=2] [ref=f1e256]'
+        - paragraph [ref=f1e257]: This is the effect that surprises teams most.
+        - paragraph [ref=f1e258]: "Every step re-sends the whole conversation so far. If each step adds about 4,000 tokens (a tool result plus the model’s reasoning), then:"
+        - table [ref=f1e259]:
+          - rowgroup [ref=f1e260]:
+            - row [ref=f1e261]:
+              - columnheader "Step" [ref=f1e262]
+              - columnheader "Context sent this step" [ref=f1e263]
+          - rowgroup [ref=f1e264]:
+            - row [ref=f1e265]:
+              - cell "1" [ref=f1e266]
+              - cell "4k" [ref=f1e267]
+            - row [ref=f1e268]:
+              - cell "5" [ref=f1e269]
+              - cell "20k" [ref=f1e270]
+            - row [ref=f1e271]:
+              - cell "10" [ref=f1e272]
+              - cell "40k" [ref=f1e273]
+            - row [ref=f1e274]:
+              - cell "20" [ref=f1e275]
+              - cell "80k" [ref=f1e276]
+        - paragraph [ref=f1e277]:
+          - text: A team might estimate “20 steps × 4k = 80k tokens per task.” The real number is the
+          - strong [ref=f1e278]: sum
+          - text: "of every step’s context:"
+        - blockquote [ref=f1e279]:
+          - paragraph [ref=f1e280]:
+            - text: 4k + 8k + 12k + … + 80k =
+            - strong [ref=f1e281]: 840k input tokens
+        - paragraph [ref=f1e282]:
+          - text: That’s more than ten times the estimate. Cost and latency grow with the
+          - emphasis [ref=f1e283]: square
+          - text: of the step count, not in a straight line. Doubling the steps roughly quadruples the input tokens.
+        - document [ref=f1e285]:
+          - generic [ref=f1e294]:
+            - paragraph [ref=f1e301]: More steps
+            - paragraph [ref=f1e308]: Bigger contexteach step
+            - paragraph [ref=f1e315]: Each step slowerand costlier
+            - paragraph [ref=f1e322]: Model attentionspread thinner
+            - paragraph [ref=f1e329]: More mistakes
+            - paragraph [ref=f1e336]: More steps to recover
+        - paragraph [ref=f1e337]: That last loop is the nasty part. Very long contexts can also make the model less focused, which causes mistakes, which causes more steps. Performance and quality problems feed each other.
+        - heading "What actually controls context growth" [level=3] [ref=f1e338]
+        - list [ref=f1e339]:
+          - listitem [ref=f1e340]:
+            - strong [ref=f1e341]: Keep tool results small.
+            - text: The single biggest win in most agents. A tool that returns a 30k-token JSON blob when the model needed three fields is a performance bug. Return summaries, the fields that matter, and a way to ask for more (pagination, an ID to fetch details).
+          - listitem [ref=f1e342]:
+            - strong [ref=f1e343]: Cache the stable prefix.
+            - text: Providers cache prompts by exact prefix. Keep the system prompt and tool definitions identical across calls and put them first. In an agent loop, the conversation history is also a stable prefix that only grows, so it caches well too, as long as you only append and never edit earlier turns. Cached input is typically billed at a small fraction of the normal price and processed faster.
+          - listitem [ref=f1e344]:
+            - strong [ref=f1e345]: Clear what’s no longer needed.
+            - text: "Old tool results the agent has already acted on can often be dropped or replaced with a one-line note. Many platforms now support clearing old tool results or summarizing (compacting) older history automatically. Use it, but test it: dropping the wrong thing causes the agent to redo work."
+          - listitem [ref=f1e346]:
+            - strong [ref=f1e347]: Split long tasks into sub-agents.
+            - text: A sub-agent that reads twenty documents and returns a one-paragraph finding keeps those twenty documents out of the main agent’s context. You pay for the sub-agent’s tokens once, instead of re-sending them on every later step.
+        - paragraph [ref=f1e348]: "Back to the example: with tool results trimmed from 4k to 1.5k per step and the prefix cached, the same 20-step task drops from 840k full-price input tokens to roughly 315k, most of them served from cache. Same agent, same answers, a fraction of the cost."
+        - 'heading "3. Capacity: tokens are the scarce resource, not CPU" [level=2] [ref=f1e349]'
+        - heading "One request is not one request" [level=3] [ref=f1e350]
+        - paragraph [ref=f1e351]: In a normal web service, one user request is roughly one unit of work. With agents, one user request becomes 5, 20, or 50 model calls, each with a growing context. Your servers will be mostly idle while you hit the provider’s limits.
+        - paragraph [ref=f1e352]:
+          - text: Model providers rate-limit on
+          - strong [ref=f1e353]: requests per minute
+          - text: and
+          - strong [ref=f1e354]: tokens per minute
+          - text: ". For agents, the token limit almost always hits first. A worked example:"
+        - blockquote [ref=f1e355]:
+          - paragraph [ref=f1e356]:
+            - text: Each task uses about 300k input tokens (after trimming). Your account allows 2M input tokens per minute.
+            - strong [ref=f1e357]: Maximum throughput ≈ 6 or 7 tasks per minute,
+            - text: no matter how many servers you run.
+        - paragraph [ref=f1e358]: That’s the number to put in the capacity plan. Adding pods doesn’t move it. Only fewer tokens per task, caching (cached tokens often count differently against limits), higher limits, or spreading load across providers or regions moves it.
+        - heading "Protect the system with a queue, not with retries" [level=3] [ref=f1e359]
+        - paragraph [ref=f1e360]:
+          - text: "When an agent fleet hits rate limits, the natural reaction is retrying, and that makes it worse: every retry re-sends a big context and burns more of the same limit. The fix is"
+          - strong [ref=f1e361]: admission control
+          - text: ": decide how many agents run at once, and queue the rest."
+        - document [ref=f1e363]:
+          - generic [ref=f1e365]:
+            - generic [ref=f1e372]:
+              - paragraph [ref=f1e378]: "Yes"
+              - paragraph [ref=f1e384]: "No"
+            - generic [ref=f1e385]:
+              - paragraph [ref=f1e392]: User tasks
+              - paragraph [ref=f1e399]: Task queuewith priority
+              - paragraph [ref=f1e406]: Token budgetavailable?
+              - paragraph [ref=f1e413]: Agent workersfixed concurrency
+              - paragraph [ref=f1e420]: Wait in queueshow position to user
+              - paragraph [ref=f1e427]: Shared rate limitertokens per minute
+              - paragraph [ref=f1e434]: Model provider
+              - paragraph [ref=f1e441]: Tools andinternal APIs
+        - paragraph [ref=f1e442]: "What this buys you:"
+        - list [ref=f1e443]:
+          - listitem [ref=f1e444]:
+            - strong [ref=f1e445]: Predictable behavior under load.
+            - text: At peak, tasks wait in a visible queue instead of failing randomly halfway through.
+          - listitem [ref=f1e446]:
+            - strong [ref=f1e447]: Priority.
+            - text: An interactive user’s task can jump ahead of a nightly batch job.
+          - listitem [ref=f1e448]:
+            - strong [ref=f1e449]: Fairness.
+            - text: Per-tenant limits stop one heavy customer from consuming everyone’s capacity.
+          - listitem [ref=f1e450]:
+            - strong [ref=f1e451]: Graceful degradation.
+            - text: Under heavy load, you can route lower-priority work to a smaller, cheaper model or a lower reasoning-effort setting instead of rejecting it.
+        - heading "Your own tools become the bottleneck" [level=3] [ref=f1e452]
+        - paragraph [ref=f1e453]: Agents are very good at load-testing your internal APIs by accident. A hundred concurrent agents, each calling a search tool five times in parallel, is 500 simultaneous requests to a service that was sized for a human-driven UI.
+        - paragraph [ref=f1e454]: "Before scaling agents, check every tool they call:"
+        - list [ref=f1e455]:
+          - listitem [ref=f1e456]: Does the downstream service have the capacity for agent traffic, not just human traffic?
+          - listitem [ref=f1e457]: Does the tool have its own timeout, rate limit, and circuit breaker?
+          - listitem [ref=f1e458]: Is it safe to call twice? Agents retry and repeat themselves. Any tool that writes data needs an idempotency key.
+        - heading "4. Long-running tasks need durable state" [level=2] [ref=f1e459]
+        - paragraph [ref=f1e460]: An agent that runs for ten minutes can’t live inside an HTTP request. Connections drop, pods restart during deploys, and providers have brief outages. If the agent’s state only exists in memory, any of those means starting over, and paying for every step again.
+        - paragraph [ref=f1e461]: "Treat a long agent task like a workflow, not a request:"
+        - document [ref=f1e463]:
+          - generic [ref=f1e464]: Model
+          - generic [ref=f1e467]: Agent worker
+          - generic [ref=f1e470]: Task store
+          - generic [ref=f1e473]: API
+          - generic [ref=f1e476]: User
+          - generic [ref=f1e479]: Model
+          - generic [ref=f1e483]: Agent worker
+          - generic [ref=f1e487]: Task store
+          - generic [ref=f1e491]: API
+          - generic [ref=f1e495]: User
+          - generic [ref=f1e499]:
+            - generic [ref=f1e501]: loop
+            - generic [ref=f1e502]: "[Each step]"
+          - generic [ref=f1e503]: Start task
+          - generic [ref=f1e504]: Create task, status running
+          - generic [ref=f1e505]: Task ID
+          - generic [ref=f1e506]: Next step with context
+          - generic [ref=f1e507]: Tool call or answer
+          - generic [ref=f1e508]: Checkpoint step and result
+          - generic [ref=f1e509]: Mark complete
+          - generic [ref=f1e510]: Poll or subscribe for updates
+        - list [ref=f1e511]:
+          - listitem [ref=f1e512]:
+            - strong [ref=f1e513]: Checkpoint after every step.
+            - text: If the worker dies at step 14, a new worker resumes at step 15 instead of step 1.
+          - listitem [ref=f1e514]:
+            - strong [ref=f1e515]: Return a task ID, not a held connection.
+            - text: Users get progress through polling or a stream that can reconnect.
+          - listitem [ref=f1e516]:
+            - strong [ref=f1e517]: Set a step limit and a budget per task.
+            - text: An agent stuck in a loop should stop at a known ceiling, not run until someone notices the bill. Some platforms let you give the model a token budget it can see, so it plans to finish within it instead of being cut off.
+        - heading "5. The development loop is a performance problem too" [level=2] [ref=f1e518]
+        - paragraph [ref=f1e519]:
+          - text: "Teams talk about agent performance in production and forget the one that slows them down every day:"
+          - strong [ref=f1e520]: iteration speed
+          - text: .
+        - paragraph [ref=f1e521]: Testing an agent is slow and expensive. A real run takes a minute and costs real money. Results vary run to run. A twenty-case eval suite can take half an hour and still not tell you clearly whether your change helped.
+        - paragraph [ref=f1e522]: "What keeps the development loop fast:"
+        - document [ref=f1e524]:
+          - generic [ref=f1e527]:
+            - paragraph [ref=f1e534]: Code or promptchange
+            - paragraph [ref=f1e541]: Unit tests:tools in isolationseconds
+            - paragraph [ref=f1e548]: Replay tests:recorded model andtool responsesseconds
+            - paragraph [ref=f1e555]: Small live eval:20 key casesminutes
+            - paragraph [ref=f1e562]: Full eval suitein CIbefore merge
+            - paragraph [ref=f1e569]: Canary inproduction
+        - list [ref=f1e570]:
+          - listitem [ref=f1e571]:
+            - strong [ref=f1e572]: Test tools without the model.
+            - text: "Most agent bugs are ordinary tool bugs: a bad query, a missing field, a slow endpoint. Plain unit tests catch them in seconds."
+          - listitem [ref=f1e573]:
+            - strong [ref=f1e574]: Record and replay.
+            - text: Capture a real run’s model responses and tool results, then replay them to test your loop logic, checkpointing, and error handling without calling the model at all. Fast, free, and repeatable.
+          - listitem [ref=f1e575]:
+            - strong [ref=f1e576]: Keep a small “smoke” eval.
+            - text: Twenty carefully chosen tasks that run in a few minutes, for quick feedback during development. Save the full suite for CI.
+          - listitem [ref=f1e577]:
+            - strong [ref=f1e578]: Run evals several times.
+            - text: Agents vary between runs. One pass/fail tells you little. Three runs and a pass rate tells you a lot more.
+          - listitem [ref=f1e579]:
+            - strong [ref=f1e580]: Track steps and tokens per task in every eval.
+            - text: A change that keeps accuracy the same but adds four steps per task is a performance regression. Catch it before production does.
+        - heading "6. Measure the things that actually move" [level=2] [ref=f1e581]
+        - paragraph [ref=f1e582]: "Generic monitoring won’t show you any of the problems above. For agents, the useful numbers are:"
+        - table [ref=f1e583]:
+          - rowgroup [ref=f1e584]:
+            - row [ref=f1e585]:
+              - columnheader "Metric" [ref=f1e586]
+              - columnheader "Why it matters" [ref=f1e587]
+          - rowgroup [ref=f1e588]:
+            - row [ref=f1e589]:
+              - cell "Steps per task, as a distribution" [ref=f1e590]
+              - cell "The long tail of 40-step tasks is usually where cost and latency hide" [ref=f1e591]
+            - row [ref=f1e592]:
+              - cell "Input tokens per step and per task" [ref=f1e593]
+              - cell "Shows context growth and tool results that are too large" [ref=f1e594]
+            - row [ref=f1e595]:
+              - cell "Cache hit rate on input tokens" [ref=f1e596]
+              - cell "A sudden drop means someone broke the stable prefix" [ref=f1e597]
+            - row [ref=f1e598]:
+              - cell "Time per step, split into model and tool" [ref=f1e599]
+              - cell "Tells you where to spend optimization effort" [ref=f1e600]
+            - row [ref=f1e601]:
+              - cell "Token budget used vs provider limit" [ref=f1e602]
+              - cell "Your real capacity headroom" [ref=f1e603]
+            - row [ref=f1e604]:
+              - cell "Queue wait time" [ref=f1e605]
+              - cell "Your first warning sign that capacity is running out" [ref=f1e606]
+            - row [ref=f1e607]:
+              - cell "Cost per completed task" [ref=f1e608]
+              - cell "The number that decides whether the agent is worth running at all" [ref=f1e609]
+        - paragraph [ref=f1e610]: The distribution of steps per task is the one I’d look at first. When an agent is slow or expensive, it’s rarely because the average task got worse. It’s usually because a small share of tasks are wandering, taking three or four times the normal number of steps. Find those tasks, read their traces, and you’ll usually find a missing tool, a confusing tool result, or an unclear instruction.
+        - heading "Where to start" [level=2] [ref=f1e611]
+        - paragraph [ref=f1e612]: When an agent is too slow or too expensive, work in this order. The early steps are cheaper and usually give more back.
+        - document [ref=f1e614]:
+          - generic [ref=f1e616]:
+            - generic [ref=f1e620]:
+              - paragraph [ref=f1e626]: "Yes"
+              - paragraph [ref=f1e632]: "No"
+            - generic [ref=f1e633]:
+              - paragraph [ref=f1e640]: Agent too slowor too expensive
+              - paragraph [ref=f1e647]: Could this be apipeline instead?
+              - paragraph [ref=f1e654]: Replace the loopwith fixed steps
+              - paragraph [ref=f1e661]: Trim tool resultsand cache the prefix
+              - paragraph [ref=f1e668]: "Cut steps: stronger tools,parallel calls, preload data"
+              - paragraph [ref=f1e675]: Right-size the model:smaller model or lowereffort for simple steps
+              - paragraph [ref=f1e682]: Move heavy readinginto sub-agents
+              - paragraph [ref=f1e689]: Queue, budgets, andadmission control for scale
+        - paragraph [ref=f1e690]:
+          - text: Notice what’s
+          - emphasis [ref=f1e691]: not
+          - text: "on the list early: switching to a faster model. It’s tempting because it’s a one-line change, but it rarely fixes an agent that takes too many steps or carries too much context. It just makes a bad loop run a bit faster."
+        - heading "The tradeoffs worth being honest about" [level=2] [ref=f1e692]
+        - paragraph [ref=f1e693]: "Every fix above has a cost:"
+        - list [ref=f1e694]:
+          - listitem [ref=f1e695]:
+            - strong [ref=f1e696]: Stronger tools mean less flexibility.
+            - text: A tool that does three things in one call is faster, and the model can no longer combine those pieces in new ways.
+          - listitem [ref=f1e697]:
+            - strong [ref=f1e698]: Parallel calls make failures messier.
+            - text: When three calls run at once and one fails, the agent and your error handling have to cope with partial results.
+          - listitem [ref=f1e699]:
+            - strong [ref=f1e700]: Clearing context can cause rework.
+            - text: Drop a tool result the agent needed later, and it calls the tool again. Measure before and after.
+          - listitem [ref=f1e701]:
+            - strong [ref=f1e702]: Sub-agents add hops.
+            - text: They save main-context tokens but add their own latency and their own failure modes. They pay off for heavy reading, not for small lookups.
+          - listitem [ref=f1e703]:
+            - strong [ref=f1e704]: Queues make peak-time waits visible.
+            - text: That’s honest and better than random failures, but someone has to agree that “your task is 4th in line” is an acceptable experience.
+        - paragraph [ref=f1e705]: None of these are reasons to skip the fixes. They’re reasons to measure each one instead of applying all of them at once.
+        - heading "The takeaway" [level=2] [ref=f1e706]
+        - paragraph [ref=f1e707]: Agent performance isn’t one problem you solve once. It’s a few small effects, more steps, bigger context, more calls per request, multiplying each other. The teams that scale agents well don’t have a faster model than everyone else. They have fewer steps, smaller contexts, a queue in front of the provider, and a dashboard that shows steps and tokens per task.
+        - paragraph [ref=f1e708]:
+          - text: "The question to ask before every agent launches:"
+          - strong [ref=f1e709]: what does one task cost in steps, tokens, and seconds, and what happens when a thousand of them run at once?
+          - text: If nobody can answer that yet, it isn’t ready to scale. For the dependency side of the same picture, timeouts, fallbacks, and contracts, see
+          - link "The LLM Is a Backend Dependency" [ref=f1e710] [cursor=pointer]:
+            - /url: /blog/llm-as-a-backend-dependency
+          - text: .
+    - contentinfo [ref=f1e711]:
+      - generic [ref=f1e712]: © 2026 Dhiyanesh Sidhaiyan
+      - generic [ref=f1e713]:
+        - link "GitHub" [ref=f1e714] [cursor=pointer]:
+          - /url: https://github.com/Dhiyanesh-Sidhaiyan
+        - link "LinkedIn" [ref=f1e717] [cursor=pointer]:
+          - /url: https://www.linkedin.com/in/dhiyanesh-s/
+  - generic [ref=f1e722]:
+    - button [ref=f1e723]
+    - button [ref=f1e729]
+    - button [ref=f1e733]
+    - button [ref=f1e741]
